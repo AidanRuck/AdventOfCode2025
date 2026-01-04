@@ -66,3 +66,15 @@ This ensures:
 
 ## Part 2 - Transitioning to VHDL
 After completing my prototype in C++, I then moved to translate my design into VHDL that could be synthesized in RTL via Xilinx Vivado.
+
+### Inputting Text to VHDL
+I realized early on to the development of my VHDL version that I could not use a .txt file as an input like I did with my C++ implementation.
+
+I figured that I could convert my .txt input to some form of file readable in Vivado for simulation on Hardware. I settled on a .mem input (ROM format), which can be read for Part 1 and Part 2.
+
+I then created a short Python script that should convert my input into a .mem file. The file:
+- Converts the text input into a 64-bit memory image
+- Mirrors the original file
+- Removes text parsing such that VHDL can process it autonomously
+  
+The mentioned Python script can be found labelled as `convertToMem.py` in this folder. To run the script, use the following command: `python convertToMem.py <input.txt> <output.mem` in a terminal at the same location as your input file.
