@@ -1,5 +1,6 @@
 # Advent of Code 2025 - Day 5
 **Author:** Aidan Ruck
+
 **Languages:** C++ -> VHDL -> Hardcaml
 
 ---
