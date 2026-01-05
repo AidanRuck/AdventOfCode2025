@@ -36,7 +36,7 @@ My fixes were:
 - Switching all `int` to `long long`
 - Switching all `stoi` to `stoll`
 
-I also notices a large issue with using standard `cin` commands, so I swapped over to `getline` commands to safely read large inputs and filter whitespace.
+I also noticed a large issue with using standard `cin` commands, so I swapped over to `getline` commands to safely read large inputs and filter whitespace.
 
 ### Running the Program
 After running the command `Get-Content day5input.txt | ./Day5Part1`, I recieved a list of all ingredient IDs that were fresh as well as a total number at the end.
@@ -58,7 +58,7 @@ This ensures:
 - Overlapping ranges don't cause double counting
 - An efficient solution over a large range.
 
-To run this command, very similarly to Part 1, run the command: `Get-Content day5input.txt | ./Day5Part2`.
+To run this program, very similarly to Part 1, run the command: `Get-Content day5input.txt | ./Day5Part2`.
 
 ### Results
 - Part 1 ran smoothly, successfully identifying which IDs were fresh
@@ -79,7 +79,7 @@ I then created a short Python script that should convert my input into a .mem fi
 - Mirrors the original file
 - Removes text parsing such that VHDL can process it autonomously
   
-The mentioned Python script can be found labelled as `convertToMem.py` in this folder. To run the script, use the following command: `python convertToMem.py <input.txt> <output.mem` in a terminal at the same location as your input file.
+The mentioned Python script can be found labelled as `convertToMem.py` in this folder. To run the script, use the following command: `python convertToMem.py <input.txt> <output.mem>` in a terminal at the same location as your input file.
 
 ### High-Level Ideas (RTL Design)
 
