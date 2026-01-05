@@ -16,7 +16,7 @@ The goal of Part 1 is to determine which IDs are fresh. Part 2 is counting all F
 
 I figured to take on a challenge like moving my code from objct-oriented to a hardware description language, I would first build a solution in C++ to reference as I created it in other languages.
 
-## Part 1 - C++
+# Part 1 - C++
 
 ### Initial Approach
 First, my thoughts were:
@@ -41,7 +41,7 @@ I also notices a large issue with using standard `cin` commands, so I swapped ov
 ### Running the Program
 After running the command `Get-Content day5input.txt | ./Day5Part1`, I recieved a list of all ingredient IDs that were fresh as well as a total number at the end.
 
-### Moving to the Second Part of Day 5
+## Moving to the Second Part of Day 5
 The second part of Today's problem revolves around how many integers are covered by the combination of all ranges, ignoring which of the ingredient IDs are available and fresh.
 
 It seemed not feasible to loop through every number, or to store every ID in memory since it would be time-consuming and memory-intensive.
@@ -58,13 +58,15 @@ This ensures:
 - Overlapping ranges don't cause double counting
 - An efficient solution over a large range.
 
+To run this command, very similarly to Part 1, run the command: `Get-Content day5input.txt | ./Day5Part2`.
+
 ### Results
 - Part 1 ran smoothly, successfully identifying which IDs were fresh
 - Part 2 correctly counted which number of fresh ingredient IDs were in the ranges
 - Handles the large numbers with long long
 - Input handling required no sanitization from the line endings or whitespace.
 
-## Part 2 - Transitioning to VHDL
+# Part 2 - Transitioning to VHDL
 After completing my prototype in C++, I then moved to translate my design into VHDL that could be synthesized in RTL via Xilinx Vivado.
 
 ### Inputting Text to VHDL
@@ -78,3 +80,67 @@ I then created a short Python script that should convert my input into a .mem fi
 - Removes text parsing such that VHDL can process it autonomously
   
 The mentioned Python script can be found labelled as `convertToMem.py` in this folder. To run the script, use the following command: `python convertToMem.py <input.txt> <output.mem` in a terminal at the same location as your input file.
+
+### High-Level Ideas (RTL Design)
+
+My DUT:
+1. Reads the Number of Ranges
+2. Stores the ranges as (start/end) pairs
+3. Reads the Number of Indexes
+4. For each ID
+   - Check it against all ranges
+   - If it is in a range, it is fresh
+
+Ranges stored using arrays `rangeLow(i)` and `rangeHigh(i)`.
+
+Maximum Number of Ranges represented by a generic, `gMaxRanges`.
+
+My design functions off of a simple FSM with States:
+- sReadNR: Read Number of Ranges
+- sReadRangeStart: Read the start of a range
+- sReadRangeEnd: Read the end of a range and store it
+- sReadNI: Read the Number of IDs
+- sReadID: Read one ingredient ID
+- sScan: Scan all of the stored Ranges for the given ID
+- sFinish: Mark as complete and output the final result
+
+This generates a few different outputs:
+- freshValid: This pulses when a fresh ID is detected
+- freshID: The ID that is detected when freshValid goes to 1
+- freshCount: The total number of fresh IDs that have been counted
+- done: This stays high when all values have been processed
+- countValid: One pulse when the final count is valid
+
+### Testbench Design
+
+This testbench file:
+- Uses `textio` to load the .mem file into a simulated ROM array
+- Drives the clock and reset signals
+- Connects the ROM model to the DUT interface
+- Prints the IDs and final count when done
+
+To ensure that the simulator can see the .mem file in Vivado (or alternative software):
+- Add it as a Simulation Source (if using Vivado)
+- Or: Place it in the simulation run directory that xSim will use
+
+### Issues and Fixes (cont.)
+
+Origally, countValid stayed high forever when sFinish was triggered, so the monitor continuously printed that it was done every clock cycle. This made it such that the final count was burried when extra padding time had been given for the simulation to complete.
+
+To combat this issue, I updated it that once the state triggered, and it verified that it was done, I ensured that it never kept cycling, only triggering the finished state once.
+
+There are also negative "Fresh ID Found: " prints which are caused by printing the low 32 bits as a signed integer (instead of unsigned as they're stored) which causes values above 2^31 to be negative. Though this did not impact functionality (as I still got the correct answer output), I theorized that this could be fixed by displaying them as hex, or changing them to be stored as unsigned variables.
+
+### How to Run
+
+1. Convert the AoC input to a .mem file as outlined above
+2. Open Vivado (or similar software)
+3. Add `freshFilter.vhd` as a Design Source
+4. Add `tb_freshFilter.vhd` as a Simulation Source
+5. Add `day5input.mem` (or equivalent file) under Simulation Source (if doing it this way)
+6. Run a Behavioral Simulation
+7. Outputs can be seen in the transcript / log via `freshCount`, `freshValid`, `done,` and `freshID`.
+
+## Moving to Part Two in VHDL
+
+As above, Part Two ignores the list of IDs and instead asks for the unique IDs covered by all ranges (inclusive).
