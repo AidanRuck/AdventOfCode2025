@@ -144,3 +144,19 @@ There are also negative "Fresh ID Found: " prints which are caused by printing t
 ## Moving to Part Two in VHDL
 
 As above, Part Two ignores the list of IDs and instead asks for the unique IDs covered by all ranges (inclusive).
+
+### High-Level Design
+
+1. Read the ranges from the .mem file (the same as Part One)
+2. Sort the ranges using bubble sort
+3. Merge ranges in one single pass, gathering total length
+4. Output `freshCount` as a total of the ranges
+5. Pulse `done` and `countValid`
+
+In theory, this should work if:
+- Ranges overlap
+- Ranges are out of order
+
+This question does not need the list of IDs, so we will just ignore them for now.
+
+Though this is not the fastest solution, it should be able to scale to 1000+ ranges with enough given simulation time.
