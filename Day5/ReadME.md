@@ -160,3 +160,88 @@ In theory, this should work if:
 This question does not need the list of IDs, so we will just ignore them for now.
 
 Though this is not the fastest solution, it should be able to scale to 1000+ ranges with enough given simulation time.
+
+### Architecture
+
+This will use the same .mem file input as Part One but looks for something else once all ranges have been read.
+
+Once the (start, end) pairs are stored, the proram then goes to:
+1. Sorting
+2. Merging and Accumulation
+
+This is all in one finite state machine to keep the control flow easily tracable.
+
+### Sorting
+
+Ranges are sorted first by ascending start value, then by ascending end value (of the starts happen to be equal). 
+
+I also used bubble sort for this stage, though it can be inefficient in software. For hardware, however, there are many advantages:
+- Easy to implement in HDLs / RTL
+- Easy to debug
+- No extra memory usage
+- Stable and very deterministic.
+
+Each swap and comparison occurs in a single clock cycle. This measn that sorting happens in O(n^2) cycles, but for simulation-scale inputs, this is acceptable.
+
+Once sorted, the design uses a single linear pass to ensure the union of every range. It keeps track of the beginning of the current merged interval `currentStart`, and the end of the current merged interval `currentEnd`.
+
+For each new range:
+- If disjoint (the next start is greater than the current end point + 1), then:
+  - The length of the previous interval is added to the total
+  - A new interval is started
+- If it overlaps / touches: 
+  -  The interval is extended
+
+All of the ranges are inclusive, so the lengths are computed as (end - start) + 1.
+
+At the end of the merge pass, the final interval is computed and the total gets stored in `freshCount`.
+
+### Testbech Desig (Part Two)
+
+The testbench:
+- Loads the .mem file using `textio`
+- Models the ROM
+- Drives the clock and reset signals
+- Waits for the done signal to pulse to '1'
+- Prints the final result
+
+Since VHDL does not support printing 64-bit unsigned integers directly, a custom conversion function had to be implemented to correctly display the large value.
+
+### Final Results for Part Two in VHDL
+
+This design exactly matches the result from my C++ version, meaning that:
+- Range sorting is correct
+- The merge logic is correct
+- Inclusive range handling works as intended
+- No double counting occurs
+
+### Issues and Fixes (cont.)
+
+1. Sorting runtine
+   - Bubble sort required a significantly longer simulation time
+   - It was fixed by running the simulation for at least .2 milliseconds (which covers my file, though it may be different)
+2. Total printing was incorrect
+   - Initially, only the lowest 32 bits of `freshCount` were being printed
+   - This was obviously incorrect (the output was larger than 32 bits)
+   - I then verified that the output was the equivalent to modulo 2^32
+   - I then fixed this by implementing a full 64-bit decimal conversion helper function
+
+### VHDL Design Summary
+
+My design shows that a text based software problem can translated into a hardware description language that can be synthesized and ran. This design uses:
+- .mem file bulk input
+- Finite state machines
+- On-chip storage
+- Sorting and merging algorithms created in RTL
+
+### How to Run (cont.)
+
+1. Open Vivado (or similar software)
+2. Add `freshFilterPart2.vhd` as a Design Source
+3. Add `tb_freshFilterPart2.vhd` as a Simulation Source
+4. Add `day5input.mem` (or equivalent file) under Simulation Source (if doing it this way)
+   - This should have been created during the last process, use the same file as before.
+5. Run a Behavioral Simulation
+6. Outputs can be seen in the transcript / log via `freshCount`, `freshValid`, `done,` and `freshID`.
+
+## Transitioning to Hardcaml
