@@ -244,4 +244,4 @@ My design shows that a text based software problem can translated into a hardwar
 5. Run a Behavioral Simulation
 6. Outputs can be seen in the transcript / log via `freshCount`, `freshValid`, `done,` and `freshID`.
 
-## Transitioning to Hardcaml
+# Transitioning to Hardcaml
