@@ -245,3 +245,5 @@ My design shows that a text based software problem can translated into a hardwar
 6. Outputs can be seen in the transcript / log via `freshCount`, `freshValid`, `done,` and `freshID`.
 
 # Transitioning to Hardcaml
+
+First, I had to install Hardcaml and review the documentation. Admittedly, this is the first time that I have used the language, so I had a lot to learn.
