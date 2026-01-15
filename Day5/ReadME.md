@@ -249,3 +249,5 @@ My design shows that a text based software problem can translated into a hardwar
 First, I had to install Hardcaml and review the documentation. Admittedly, this is the first time that I have used the language, so I had a lot to learn.
 
 I reviewed the documentation the Jane Street GitHub repository for Hardcaml, as well as brushed up on Ocaml.
+
+I then created my project folder within WSL (I personally have Ubuntu installed) and got to work. I first made a bare-bones model of my first part, just to confirm that I could build and compile a file.
